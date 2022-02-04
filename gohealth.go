@@ -1,8 +1,19 @@
 package gohealth
 
+const (
+	defaultPort = 8080
+)
+
+// HandlerTask - healtch check handler constructor data
+type HandlerTask struct {
+	DisableGin bool // disable web-server
+	ListenPort int
+}
+
 // Handler - go-healthcheck handler
 type Handler struct {
-	Checkpoints []Checkpoint
+	task        HandlerTask
+	checkpoints []Checkpoint
 }
 
 // Signal - service health signal
@@ -20,8 +31,11 @@ type Checkpoint struct {
 }
 
 // NewHandler - create new health check handler for service
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(task HandlerTask) *Handler {
+	return &Handler{
+		task:        task,
+		checkpoints: make([]Checkpoint, 0),
+	}
 }
 
 func newCheckpoint(data CheckpointData) Checkpoint {
@@ -50,13 +64,13 @@ type CheckpointData struct {
 
 // AddCheckpoint - add new health checkpoint
 func (h *Handler) AddCheckpoint(data CheckpointData) {
-	h.Checkpoints = append(h.Checkpoints, newCheckpoint(data))
+	h.checkpoints = append(h.checkpoints, newCheckpoint(data))
 }
 
 // Check service
 func (h *Handler) Check() []Signal {
 	indicators := []Signal{}
-	for _, checkpoint := range h.Checkpoints {
+	for _, checkpoint := range h.checkpoints {
 		indicators = append(indicators, checkpoint.callback())
 	}
 	return indicators

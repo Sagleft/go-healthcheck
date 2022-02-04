@@ -28,7 +28,7 @@ go get github.com/Sagleft/go-healthcheck
 First we create a handler on the top level of the service:
 
 ```go
-var Healthchecker *gohealth.Handler = gohealth.NewHandler()
+var Healthchecker *gohealth.Handler = gohealth.NewHandler(gohealth.HandlerTask{})
 ```
 
 Then write checks in the necessary places in your service:
