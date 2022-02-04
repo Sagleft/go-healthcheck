@@ -1,7 +1,9 @@
 package gohealth
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +16,7 @@ const (
 // HandlerTask - healtch check handler constructor data
 type HandlerTask struct {
 	DisableGin bool // disable web-server
+	DisableLog bool
 	ListenPort string
 }
 
@@ -47,7 +50,8 @@ func NewHandler(task HandlerTask) *Handler {
 	if task.ListenPort == "" {
 		h.task.ListenPort = defaultPort
 	}
-	if task.DisableGin {
+	if !task.DisableGin {
+		gin.SetMode(gin.ReleaseMode)
 		h.gin = gin.Default()
 		h.setup()
 	}
@@ -55,8 +59,26 @@ func NewHandler(task HandlerTask) *Handler {
 }
 
 func (h *Handler) setup() {
+	h.setupLog()
 	h.gin.GET("/healthcheck", h.doHealthCheck)
 	go h.gin.Run(":" + h.task.ListenPort)
+}
+
+func (h *Handler) setupLog() {
+	h.gin.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		if h.task.DisableLog {
+			return ""
+		}
+		return fmt.Sprintf("[%s] \"%s %s %s %d %s \" %s\"\n",
+			param.TimeStamp.Format(time.RFC1123),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.ErrorMessage,
+		)
+	}))
 }
 
 func (h *Handler) doHealthCheck(c *gin.Context) {
