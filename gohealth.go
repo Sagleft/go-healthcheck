@@ -121,6 +121,13 @@ func (h *Handler) AddCheckpoint(data CheckpointData) {
 	h.checkpoints = append(h.checkpoints, newCheckpoint(data))
 }
 
+// AddCheckpoints - add new health checkpoint
+func (h *Handler) AddCheckpoints(checkpoints []CheckpointData) {
+	for _, data := range checkpoints {
+		h.checkpoints = append(h.checkpoints, newCheckpoint(data))
+	}
+}
+
 // Check service
 func (h *Handler) Check() []Signal {
 	indicators := []Signal{}
