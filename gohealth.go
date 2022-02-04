@@ -1,19 +1,27 @@
 package gohealth
 
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
 const (
-	defaultPort = 8080
+	defaultPort     = "8080"
+	defaultResponse = "OK"
 )
 
 // HandlerTask - healtch check handler constructor data
 type HandlerTask struct {
 	DisableGin bool // disable web-server
-	ListenPort int
+	ListenPort string
 }
 
 // Handler - go-healthcheck handler
 type Handler struct {
 	task        HandlerTask
 	checkpoints []Checkpoint
+	gin         *gin.Engine
 }
 
 // Signal - service health signal
@@ -32,10 +40,34 @@ type Checkpoint struct {
 
 // NewHandler - create new health check handler for service
 func NewHandler(task HandlerTask) *Handler {
-	return &Handler{
+	h := Handler{
 		task:        task,
 		checkpoints: make([]Checkpoint, 0),
 	}
+	if task.ListenPort == "" {
+		h.task.ListenPort = defaultPort
+	}
+	if task.DisableGin {
+		h.gin = gin.Default()
+		h.setup()
+	}
+	return &h
+}
+
+func (h *Handler) setup() {
+	h.gin.GET("/healthcheck", h.doHealthCheck)
+	go h.gin.Run(":" + h.task.ListenPort)
+}
+
+func (h *Handler) doHealthCheck(c *gin.Context) {
+	for _, checkpoint := range h.checkpoints {
+		signalData := checkpoint.callback()
+		if !signalData.CheckPassed {
+			c.String(http.StatusInternalServerError, signalData.ErrorInfo)
+			return
+		}
+	}
+	c.String(http.StatusOK, defaultResponse)
 }
 
 func newCheckpoint(data CheckpointData) Checkpoint {

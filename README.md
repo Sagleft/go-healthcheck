@@ -31,6 +31,9 @@ First we create a handler on the top level of the service:
 var Healthchecker *gohealth.Handler = gohealth.NewHandler(gohealth.HandlerTask{})
 ```
 
+By default, the listening will open at: `GET 127.0.0.1:8080/healthcheck`.
+Returns the code 200 if all checks are passed, and 500 if there is an error and returns its text.
+
 Then write checks in the necessary places in your service:
 
 ```go
