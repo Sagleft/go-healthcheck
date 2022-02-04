@@ -48,9 +48,6 @@ type CheckpointData struct {
 	CheckCallback healthCheckCallback
 }
 
-// HealthCheckAnalytics - the result of the service health analysis
-type HealthCheckAnalytics struct{}
-
 // AddCheckpoint - add new health checkpoint
 func (h *Handler) AddCheckpoint(data CheckpointData) {
 	h.Checkpoints = append(h.Checkpoints, newCheckpoint(data))
