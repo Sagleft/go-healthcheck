@@ -64,3 +64,18 @@ func (h *Handler) Check() []Signal {
 	}
 	return indicators
 }
+
+// SignalError - get new errorsignal
+func SignalError(errInfo string) Signal {
+	return Signal{
+		CheckPassed: false,
+		ErrorInfo:   errInfo,
+	}
+}
+
+// SignalNormal - checkpoint passed
+func SignalNormal() Signal {
+	return Signal{
+		CheckPassed: true,
+	}
+}
