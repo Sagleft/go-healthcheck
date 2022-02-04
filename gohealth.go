@@ -86,7 +86,7 @@ func (h *Handler) doHealthCheck(c *gin.Context) {
 	for _, checkpoint := range h.checkpoints {
 		signalData := checkpoint.callback()
 		if !signalData.CheckPassed {
-			c.String(http.StatusInternalServerError, signalData.ErrorInfo)
+			c.String(http.StatusInternalServerError, checkpoint.name+": "+signalData.ErrorInfo)
 			return
 		}
 	}
