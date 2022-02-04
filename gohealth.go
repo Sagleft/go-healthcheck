@@ -33,12 +33,13 @@ type Signal struct {
 	ErrorInfo   string
 }
 
-type healthCheckCallback func() Signal
+// HealthCheckCallback - health check callback
+type HealthCheckCallback func() Signal
 
 // Checkpoint : service must pass all checkpoints before it comes to the boss battle!
 type Checkpoint struct {
 	name     string
-	callback healthCheckCallback
+	callback HealthCheckCallback
 }
 
 // NewHandler - create new health check handler for service
@@ -113,7 +114,7 @@ func defaultCallback() Signal {
 // CheckpointData - health check checkpoint data
 type CheckpointData struct {
 	Name          string
-	CheckCallback healthCheckCallback
+	CheckCallback HealthCheckCallback
 }
 
 // AddCheckpoint - add new health checkpoint
