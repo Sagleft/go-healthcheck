@@ -61,7 +61,7 @@ func NewHandler(task HandlerTask) *Handler {
 
 func (h *Handler) setup() {
 	h.setupLog()
-	h.gin.GET("/healthcheck", h.doHealthCheck)
+	h.gin.GET("/health", h.doHealthCheck)
 	go h.gin.Run(":" + h.task.ListenPort)
 }
 
